@@ -14,9 +14,11 @@ function getSpecificParams() {
     var specificParams = ["mushroom-name", "batch-id", "user-id"];
     
     // Iterate through URL parameters and filter specific ones
-    for (var param of urlParams.entries()) {
-        if (specificParams.includes(param[0])) {
-            params[param[0]] = param[1];
+    for (var param of specificParams) {
+        if (urlParams.has(param)) {
+            params[param] = urlParams.get(param);
+        } else {
+            params[param] = "not found";
         }
     }
     
