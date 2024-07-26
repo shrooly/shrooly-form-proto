@@ -2,48 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shrooly Form Proto</title>
-<script>
-// Function to parse URL parameters and filter specific ones
-function getSpecificParams() {
-    var params = {};
-    var url = window.location.search.substring(1);
-    var urlParams = new URLSearchParams(url);
-    
-    // Define the specific parameters you want to display
-    var specificParams = ["mushroom-name", "batch-id", "user-id"];
-    
-    // Iterate through URL parameters and filter specific ones
-    for (var param of specificParams) {
-        if (urlParams.has(param)) {
-            params[param] = urlParams.get(param);
-        } else {
-            params[param] = "not found";
-        }
-    }
-    
-    return params;
-}
-
-// Function to display specific parameters
-function displaySpecificParameters() {
-    var params = getSpecificParams();
-    var output = "";
-    
-    for (var key in params) {
-        if (params.hasOwnProperty(key)) {
-            output += key + ": " + params[key] + "<br>";
-        }
-    }
-    
-    document.getElementById('output').innerHTML = output;
-}
-
-function submit() {
-    document.getElementById('form-panel').innerHTML = "";
-    document.getElementById('output').innerHTML = '<h3 style="margin-bottom: 0;">Form Submitted</h3>';
-}
-</script>
+<link rel="icon" href="data:,">
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -61,11 +22,11 @@ function submit() {
         margin-bottom: 15px;
     }
     .title h2 {
-        margin-top: 0; /* Override margin-top for <h2> within .radio-group */
+        margin-top: 0;
     }
 </style>
 </head>
-<body onload="displaySpecificParameters()">
+<body>
 <div class="container">
     <div class="title">
         <h2>Shrooly Form Proto</h2>
@@ -78,8 +39,66 @@ function submit() {
         
         <input type="radio" id="no" name="like" value="no" class="radio-control">
         <label for="no">No</label><br>
-        <!-- <button onclick="submit()">Submit</button> -->
+        <button onclick="submit()">Submit</button>
     </div>
 </div>
+
+<script>
+// Function to safely parse URL parameters and filter specific ones
+function getSpecificParams() {
+    var params = {};
+    var url = new URL(window.location.href);
+    
+    // Define the specific parameters you want to display
+    var specificParams = ["mushroom-name", "batch-id", "user-id"];
+    
+    // Iterate through URL parameters and filter specific ones
+    for (var param of specificParams) {
+        params[param] = url.searchParams.get(param) || "not found";
+    }
+    
+    return params;
+}
+
+// Function to display specific parameters
+function displaySpecificParameters() {
+    var params = getSpecificParams();
+    var output = "";
+    
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            output += key + ": " + escapeHTML(params[key]) + "<br>";
+        }
+    }
+    
+    document.getElementById('output').innerHTML = output;
+}
+
+// Function to escape HTML to prevent XSS
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
+function submit() {
+    var selectedOption = document.querySelector('input[name="like"]:checked');
+    if (selectedOption) {
+        document.getElementById('form-panel').innerHTML = "";
+        document.getElementById('output').innerHTML = '<h3 style="margin-bottom: 0;">Form Submitted</h3>';
+    } else {
+        alert("Please select an option before submitting.");
+    }
+}
+
+// Event listener for page load
+window.onload = displaySpecificParameters;
+</script>
 </body>
 </html>
